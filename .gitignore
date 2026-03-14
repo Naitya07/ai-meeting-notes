@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Temp / uploads
+*.tmp
+*.temp
+tmp/
+uploads/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Meeting data (stored in ~/.meetingmind, not in repo)
+# Add this if you ever store data locally in the project
+data/
+
+# Logs
+*.log
+logs/
+
+# Whisper model cache (stored in ~/.cache/whisper)
+# No need to commit those

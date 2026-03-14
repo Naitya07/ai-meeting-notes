@@ -1,0 +1,1 @@
+# MeetingMind core package
