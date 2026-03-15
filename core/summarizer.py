@@ -1,6 +1,7 @@
 """
 MeetingMind - Summarizer
 Generates structured meeting notes from transcript using Ollama (llama3.2).
+Supports vertical-specific templates for 13 industries.
 """
 
 import json
@@ -13,6 +14,15 @@ DEFAULT_MODEL = "llama3.2"
 
 # Max characters to send to the model (avoid context overflow)
 MAX_TRANSCRIPT_CHARS = 12000
+
+
+def _get_templates_module():
+    """Lazy import of templates module to avoid circular imports."""
+    try:
+        from core import templates
+        return templates
+    except ImportError:
+        return None
 
 
 def _call_ollama(prompt: str, model: str = DEFAULT_MODEL, stream: bool = False) -> str:
@@ -113,6 +123,75 @@ def _truncate_transcript(transcript: str, max_chars: int = MAX_TRANSCRIPT_CHARS)
         f"[... {omitted:,} characters omitted for brevity ...]\n\n"
         f"{ending}"
     )
+
+
+def generate_vertical_notes(
+    transcript: str,
+    vertical_id: str,
+    template_id: str,
+    meeting_title: str = "Meeting",
+    model: str = DEFAULT_MODEL,
+    progress_callback: Optional[Callable[[str, float], None]] = None,
+) -> dict:
+    """
+    Generate vertical-specific meeting notes using industry templates.
+
+    Args:
+        transcript: The meeting transcript text
+        vertical_id: Industry vertical (e.g. "healthcare", "legal")
+        template_id: Template within the vertical (e.g. "soap_notes", "client_intake")
+        meeting_title: Title of the meeting
+        model: Ollama model to use
+        progress_callback: Optional callback(message, progress_0_to_1)
+
+    Returns:
+        Dict with template-specific structured output + raw_response
+    """
+    if not transcript or not transcript.strip():
+        raise ValueError("Transcript is empty.")
+
+    tmpl = _get_templates_module()
+    if tmpl is None:
+        # Fallback to generic notes if templates module not available
+        return generate_meeting_notes(
+            transcript, meeting_title, model, progress_callback
+        )
+
+    truncated = _truncate_transcript(transcript)
+
+    if progress_callback:
+        vertical = tmpl.get_vertical(vertical_id)
+        v_name = vertical["name"] if vertical else vertical_id.title()
+        progress_callback(f"Analyzing with {v_name} template...", 0.1)
+
+    # Build the vertical-specific prompt
+    prompt = tmpl.build_prompt(vertical_id, template_id, truncated, meeting_title)
+    if prompt is None:
+        # Template not found, fall back to generic
+        return generate_meeting_notes(
+            transcript, meeting_title, model, progress_callback
+        )
+
+    if progress_callback:
+        progress_callback("AI is generating specialized notes...", 0.3)
+
+    raw_response = _call_ollama(prompt, model=model, stream=True)
+
+    if progress_callback:
+        progress_callback("Parsing structured output...", 0.85)
+
+    # Parse and validate against template schema
+    parsed = tmpl.parse_template_output(vertical_id, template_id, raw_response)
+    if parsed is None:
+        parsed = _parse_json_response(raw_response)
+
+    if progress_callback:
+        progress_callback("Vertical notes ready!", 1.0)
+
+    parsed["raw_response"] = raw_response
+    parsed["vertical_id"] = vertical_id
+    parsed["template_id"] = template_id
+    return parsed
 
 
 def generate_meeting_notes(
