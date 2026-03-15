@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeetingMind — Edge-Native AI Meeting Intelligence Platform</title>
+  <meta name="description" content="The only AI meeting assistant where your data never leaves your device. HIPAA by design. Attorney-client privilege preserved. Zero cloud contact." />
+  <meta property="og:title" content="MeetingMind — Edge-Native AI Meeting Intelligence" />
+  <meta property="og:description" content="The only AI meeting assistant where your data never leaves your device." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #09090F;
+      --bg-card:      #0F0F1A;
+      --bg-card-2:    #13131F;
+      --border:       rgba(124, 58, 237, 0.18);
+      --border-muted: rgba(255, 255, 255, 0.07);
+      --purple:       #7C3AED;
+      --purple-light: #A78BFA;
+      --purple-dim:   rgba(124, 58, 237, 0.12);
+      --green:        #10B981;
+      --green-dim:    rgba(16, 185, 129, 0.12);
+      --red:          #EF4444;
+      --red-dim:      rgba(239, 68, 68, 0.12);
+      --text:         #F8F8FC;
+      --text-muted:   #8B8BA7;
+      --text-dim:     #5B5B72;
+      --radius:       12px;
+      --radius-lg:    20px;
+      --shadow:       0 0 0 1px var(--border), 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+
+    /* ============================================================
+       UTILITY
+    ============================================================ */
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section {
+      padding: 100px 0;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      background: var(--purple-dim);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    .text-center { text-align: center; }
+    .text-center .section-sub { margin: 0 auto; }
+
+    /* Fade-in animation */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-in.delay-1 { transition-delay: 0.1s; }
+    .fade-in.delay-2 { transition-delay: 0.2s; }
+    .fade-in.delay-3 { transition-delay: 0.3s; }
+    .fade-in.delay-4 { transition-delay: 0.4s; }
+    .fade-in.delay-5 { transition-delay: 0.5s; }
+    .fade-in.delay-6 { transition-delay: 0.6s; }
+
+    /* ============================================================
+       BACKGROUND GLOW EFFECTS
+    ============================================================ */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+
+    .nav.scrolled {
+      background: rgba(9, 9, 15, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom-color: var(--border-muted);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 10px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple), #6D28D9);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(124,58,237,0.4), 0 4px 16px rgba(124,58,237,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px rgba(124,58,237,0.6), 0 8px 24px rgba(124,58,237,0.4);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-muted);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .btn-lg {
+      font-size: 16px;
+      padding: 14px 28px;
+      border-radius: 12px;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      padding: 8px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .hamburger:hover { background: rgba(255,255,255,0.07); }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-muted);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      background: rgba(9, 9, 15, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-muted);
+      padding: 16px 24px 24px;
+      z-index: 99;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-muted);
+      transition: color 0.2s;
+    }
+
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--text); }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 160px 0 120px;
+      text-align: center;
+    }
+
+    .hero-glow-1 {
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%);
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .hero-glow-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 70%);
+      bottom: -100px;
+      right: -100px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--purple-light);
+      background: var(--purple-dim);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 16px;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-title {
+      font-size: clamp(52px, 9vw, 96px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.0;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 24px;
+    }
+
+    .hero-title-gradient {
+      background: linear-gradient(135deg, #fff 0%, var(--purple-light) 50%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 56px;
+    }
+
+    .hero-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--bg-card);
+      border: 1px solid var(--border-muted);
+      border-radius: 100px;
+      padding: 8px 16px;
+    }
+
+    .stat-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--purple-light);
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       PROBLEM / COMPARISON
+    ============================================================ */
+    .problem-section {
+      background: linear-gradient(180deg, transparent, rgba(124,58,237,0.04) 50%, transparent);
+    }
+
+    .comparison-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 52px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-muted);
+    }
+
+    .comparison-table {
+      width: 100%;
+      min-width: 640px;
+      border-collapse: collapse;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .comparison-table th {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--bg-card-2);
+      padding: 20px;
+    }
+
+    .comparison-table tr:last-child td { border-bottom: none; }
+
+    .comparison-table td:first-child {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .col-meetingmind {
+      background: rgba(16, 185, 129, 0.05);
+      border-left: 1px solid rgba(16,185,129,0.2);
+      border-right: 1px solid rgba(16,185,129,0.2);
+    }
+
+    .col-meetingmind-header {
+      background: rgba(16, 185, 129, 0.1) !important;
+      color: var(--green) !important;
+      border-left: 1px solid rgba(16,185,129,0.3);
+      border-right: 1px solid rgba(16,185,129,0.3);
+    }
+
+    .badge-green {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+
+    .badge-red {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--red);
+      background: var(--red-dim);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+
+    .badge-gray {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-muted);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+
+    /* ============================================================
+       VERTICALS GRID
+    ============================================================ */
+    .verticals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 52px;
+    }
+
+    .vertical-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      cursor: default;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vertical-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(124,58,237,0.07) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .vertical-card:hover::before { opacity: 1; }
+
+    .vertical-card:hover {
+      border-color: var(--border);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--border);
+    }
+
+    .vertical-emoji {
+      font-size: 32px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .vertical-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .vertical-count {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--purple-light);
+    }
+
+    /* ============================================================
+       HOW IT WORKS
+    ============================================================ */
+    .how-section {
+      background: linear-gradient(180deg, transparent, rgba(124,58,237,0.03) 50%, transparent);
+    }
+
+    .steps-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      margin-top: 60px;
+      flex-wrap: nowrap;
+    }
+
+    .step-item {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      padding: 0 16px;
+      position: relative;
+    }
+
+    .step-connector {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      padding-top: 40px;
+      color: var(--purple-light);
+      opacity: 0.5;
+      font-size: 24px;
+    }
+
+    .step-icon-wrap {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--purple-dim), rgba(167,139,250,0.1));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 36px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .step-item:hover .step-icon-wrap {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 16px 40px rgba(124,58,237,0.25);
+    }
+
+    .step-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      margin-bottom: 8px;
+    }
+
+    .step-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .zero-cloud-banner {
+      margin-top: 60px;
+      text-align: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 40px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--green);
+    }
+
+    /* ============================================================
+       COMPLIANCE
+    ============================================================ */
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 52px;
+    }
+
+    .compliance-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .compliance-card:hover {
+      border-color: var(--border);
+      transform: translateY(-2px);
+    }
+
+    .compliance-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .compliance-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .compliance-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .compliance-footer {
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .big-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--purple-light);
+      background: var(--purple-dim);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 10px 24px;
+    }
+
+    /* ============================================================
+       FEATURES GRID
+    ============================================================ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 52px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--purple-light), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover::after { opacity: 1; }
+
+    .feature-card:hover {
+      border-color: var(--border);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .feature-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       PRICING
+    ============================================================ */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 52px;
+      align-items: start;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      transition: border-color 0.25s, transform 0.25s;
+      position: relative;
+    }
+
+    .pricing-card:hover {
+      border-color: var(--border);
+      transform: translateY(-3px);
+    }
+
+    .pricing-card.popular {
+      border-color: var(--purple);
+      background: linear-gradient(145deg, var(--bg-card), rgba(124,58,237,0.08));
+      box-shadow: 0 0 0 1px var(--purple), 0 16px 48px rgba(124,58,237,0.2);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(90deg, var(--purple), var(--purple-light));
+      border-radius: 100px;
+      padding: 5px 16px;
+      white-space: nowrap;
+    }
+
+    .pricing-tier {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .pricing-price {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .price-amount {
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .price-period {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .pricing-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .pricing-features li::before {
+      content: '✓';
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+      background: var(--green-dim);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ============================================================
+       PRIVACY ARCHITECTURE
+    ============================================================ */
+    .privacy-section {
+      background: linear-gradient(180deg, transparent, rgba(16,185,129,0.03) 50%, transparent);
+    }
+
+    .arch-diagram {
+      margin-top: 52px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-lg);
+      padding: 48px 40px;
+      text-align: center;
+    }
+
+    .arch-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      row-gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .arch-node {
+      background: var(--bg-card-2);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      min-width: 140px;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .arch-node:hover {
+      border-color: var(--border);
+      transform: translateY(-2px);
+    }
+
+    .arch-node-icon { font-size: 28px; margin-bottom: 8px; }
+    .arch-node-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .arch-node-sub { font-size: 11px; color: var(--purple-light); font-weight: 500; margin-top: 3px; }
+
+    .arch-arrow {
+      font-size: 20px;
+      color: var(--purple-light);
+      opacity: 0.6;
+      padding: 0 8px;
+    }
+
+    .zero-cloud-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05));
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: var(--radius-lg);
+      padding: 20px 36px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: var(--green);
+    }
+
+    /* ============================================================
+       CTA SECTION
+    ============================================================ */
+    .cta-section {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .cta-glow {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+    }
+
+    .cta-box {
+      position: relative;
+      z-index: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 72px 40px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .cta-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+
+    .cta-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer {
+      border-top: 1px solid var(--border-muted);
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+    }
+
+    .footer-logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .footer-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text-muted); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--text-dim);
+      width: 100%;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 768px) {
+      .section { padding: 72px 0; }
+
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+
+      .steps-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+      }
+
+      .step-connector {
+        transform: rotate(90deg);
+        padding-top: 0;
+        display: none;
+      }
+
+      .arch-flow {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .arch-arrow {
+        transform: rotate(90deg);
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .cta-box { padding: 48px 24px; }
+
+      .arch-diagram { padding: 32px 20px; }
+
+      .pricing-grid { grid-template-columns: 1fr; max-width: 380px; margin-left: auto; margin-right: auto; }
+
+      .comparison-table th, .comparison-table td { padding: 12px 14px; font-size: 13px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero { padding: 120px 0 80px; }
+      .hero-cta .btn-lg { width: 100%; justify-content: center; }
+      .verticals-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVIGATION
+============================================================ -->
+<nav class="nav" id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon">🧠</div>
+        MeetingMind
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#verticals">Verticals</a></li>
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#compliance">Compliance</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="https://github.com/Naitya07/ai-meeting-notes" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
+        <a href="https://github.com/Naitya07/ai-meeting-notes" target="_blank" rel="noopener" class="btn btn-primary">Get Started</a>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#verticals" class="mobile-nav-link">Verticals</a>
+  <a href="#how" class="mobile-nav-link">How It Works</a>
+  <a href="#compliance" class="mobile-nav-link">Compliance</a>
+  <a href="#pricing" class="mobile-nav-link">Pricing</a>
+  <a href="#privacy" class="mobile-nav-link">Privacy</a>
+  <a href="https://github.com/Naitya07/ai-meeting-notes" target="_blank" rel="noopener">GitHub ↗</a>
+</div>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section class="hero" id="hero">
+  <div class="glow-orb hero-glow-1"></div>
+  <div class="glow-orb hero-glow-2"></div>
+
+  <div class="container">
+    <div class="hero-badge fade-in">
+      <div class="hero-badge-dot"></div>
+      Edge-Native · Fully Open Source · Zero Cloud Contact
+    </div>
+
+    <h1 class="hero-title fade-in delay-1">
+      <span class="hero-title-gradient">MeetingMind</span>
+    </h1>
+
+    <p class="hero-subtitle fade-in delay-2">
+      The only AI meeting assistant where your data never leaves your device. HIPAA by design. Attorney-client privilege preserved.
+    </p>
+
+    <div class="hero-cta fade-in delay-3">
+      <a href="https://github.com/Naitya07/ai-meeting-notes" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        Get Started — It's Free
+      </a>
+      <a href="#how" class="btn btn-ghost btn-lg">See How It Works</a>
+    </div>
+
+    <div class="hero-badges fade-in delay-4">
+      <div class="stat-badge"><div class="stat-badge-dot"></div>13 Industries</div>
+      <div class="stat-badge"><div class="stat-badge-dot"></div>37+ Templates</div>
+      <div class="stat-badge"><div class="stat-badge-dot"></div>53 Jurisdictions</div>
+      <div class="stat-badge"><div class="stat-badge-dot"></div>37 Languages</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROBLEM SECTION
+============================================================ -->
+<section class="section problem-section" id="problem">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">Every competitor sends your<br/>voice to the cloud.</h2>
+      <p class="section-sub">Your privileged conversations, medical discussions, and confidential negotiations are being transcribed on someone else's servers. That's not just a privacy issue — it's a legal liability.</p>
+    </div>
+
+    <div class="comparison-wrapper fade-in delay-2">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Feature</th>
+            <th>Otter.ai</th>
+            <th>Gong</th>
+            <th>Fireflies</th>
+            <th class="col-meetingmind-header">MeetingMind</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Data Location</td>
+            <td><span class="badge-red">☁ Cloud</span></td>
+            <td><span class="badge-red">☁ Cloud</span></td>
+            <td><span class="badge-red">☁ Cloud</span></td>
+            <td class="col-meetingmind"><span class="badge-green">🔒 YOUR DEVICE</span></td>
+          </tr>
+          <tr>
+            <td>HIPAA Compliance</td>
+            <td><span class="badge-gray">Via BAA</span></td>
+            <td><span class="badge-red">No</span></td>
+            <td><span class="badge-red">No</span></td>
+            <td class="col-meetingmind"><span class="badge-green">BY DESIGN</span></td>
+          </tr>
+          <tr>
+            <td>Attorney-Client Privilege</td>
+            <td><span class="badge-red">WAIVED</span></td>
+            <td><span class="badge-red">WAIVED</span></td>
+            <td><span class="badge-red">WAIVED</span></td>
+            <td class="col-meetingmind"><span class="badge-green">PRESERVED</span></td>
+          </tr>
+          <tr>
+            <td>Recent Lawsuits</td>
+            <td><span class="badge-red">Brewer v. Otter (2025)</span></td>
+            <td><span class="badge-gray">—</span></td>
+            <td><span class="badge-red">BIPA (2025)</span></td>
+            <td class="col-meetingmind"><span class="badge-green">ZERO</span></td>
+          </tr>
+          <tr>
+            <td>Processes Audio On-Device</td>
+            <td><span class="badge-red">No</span></td>
+            <td><span class="badge-red">No</span></td>
+            <td><span class="badge-red">No</span></td>
+            <td class="col-meetingmind"><span class="badge-green">Yes — Always</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VERTICALS
+============================================================ -->
+<section class="section" id="verticals">
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">13 Industries</div>
+      <h2 class="section-title">Built for Every Industry</h2>
+      <p class="section-sub">Purpose-built templates for every vertical, each crafted to the specific documentation standards of that profession.</p>
+    </div>
+
+    <div class="verticals-grid">
+      <div class="vertical-card fade-in delay-1">
+        <span class="vertical-emoji">🏥</span>
+        <div class="vertical-name">Healthcare</div>
+        <div class="vertical-count">4 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-1">
+        <span class="vertical-emoji">⚖️</span>
+        <div class="vertical-name">Legal</div>
+        <div class="vertical-count">4 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-2">
+        <span class="vertical-emoji">📈</span>
+        <div class="vertical-name">Financial</div>
+        <div class="vertical-count">4 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-2">
+        <span class="vertical-emoji">🐾</span>
+        <div class="vertical-name">Veterinary</div>
+        <div class="vertical-count">3 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-3">
+        <span class="vertical-emoji">👥</span>
+        <div class="vertical-name">HR</div>
+        <div class="vertical-count">3 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-3">
+        <span class="vertical-emoji">🎓</span>
+        <div class="vertical-name">Education</div>
+        <div class="vertical-count">3 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-4">
+        <span class="vertical-emoji">💼</span>
+        <div class="vertical-name">Sales</div>
+        <div class="vertical-count">3 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-4">
+        <span class="vertical-emoji">🏗️</span>
+        <div class="vertical-name">Construction</div>
+        <div class="vertical-count">3 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-5">
+        <span class="vertical-emoji">🏛️</span>
+        <div class="vertical-name">Government</div>
+        <div class="vertical-count">2 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-5">
+        <span class="vertical-emoji">⛪</span>
+        <div class="vertical-name">Religious Orgs</div>
+        <div class="vertical-count">3 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-6">
+        <span class="vertical-emoji">🛡️</span>
+        <div class="vertical-name">Insurance</div>
+        <div class="vertical-count">2 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-6">
+        <span class="vertical-emoji">🏠</span>
+        <div class="vertical-name">Real Estate</div>
+        <div class="vertical-count">2 templates</div>
+      </div>
+      <div class="vertical-card fade-in delay-6">
+        <span class="vertical-emoji">📋</span>
+        <div class="vertical-name">General</div>
+        <div class="vertical-count">1 template</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     HOW IT WORKS
+============================================================ -->
+<section class="section how-section" id="how">
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">Three steps. All on your machine.</h2>
+      <p class="section-sub">Powered by Whisper and Ollama running entirely on your device. No API keys. No subscriptions to third-party AI services.</p>
+    </div>
+
+    <div class="steps-row">
+      <div class="step-item fade-in delay-1">
+        <div class="step-icon-wrap">🎙️</div>
+        <div class="step-number">Step 01</div>
+        <div class="step-title">Record or Upload</div>
+        <div class="step-desc">Live-record your meeting or drop in an audio file. WAV, MP3, M4A — all supported.</div>
+      </div>
+
+      <div class="step-connector fade-in delay-2">→</div>
+
+      <div class="step-item fade-in delay-3">
+        <div class="step-icon-wrap">🧠</div>
+        <div class="step-number">Step 02</div>
+        <div class="step-title">AI Processes On-Device</div>
+        <div class="step-desc">Whisper transcribes locally. Ollama LLM structures the notes. 100% on your hardware.</div>
+      </div>
+
+      <div class="step-connector fade-in delay-4">→</div>
+
+      <div class="step-item fade-in delay-5">
+        <div class="step-icon-wrap">📄</div>
+        <div class="step-number">Step 03</div>
+        <div class="step-title">Get Structured Notes</div>
+        <div class="step-desc">Industry-specific formatted output: SOAP notes, legal briefs, IEPs, financial summaries, and more.</div>
+      </div>
+    </div>
+
+    <div class="zero-cloud-banner fade-in delay-2">
+      Zero cloud. &nbsp;Zero uploads. &nbsp;Zero risk.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     COMPLIANCE
+============================================================ -->
+<section class="section" id="compliance">
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">Built-In Compliance</div>
+      <h2 class="section-title">Automatic Compliance</h2>
+      <p class="section-sub">Not bolted on. Not an add-on. Compliance is the architecture — because data that never leaves your device cannot be breached, subpoenaed, or sold.</p>
+    </div>
+
+    <div class="compliance-grid">
+      <div class="compliance-card fade-in delay-1">
+        <div class="compliance-icon">🏥</div>
+        <div>
+          <div class="compliance-name">HIPAA</div>
+          <div class="compliance-desc">Protected Health Information stays on your device. No BAA required. Compliant by architecture, not paperwork.</div>
+        </div>
+      </div>
+      <div class="compliance-card fade-in delay-2">
+        <div class="compliance-icon">⚖️</div>
+        <div>
+          <div class="compliance-name">Attorney-Client Privilege</div>
+          <div class="compliance-desc">Third-party disclosure doctrine cannot attach. Your privileged communications are never transmitted.</div>
+        </div>
+      </div>
+      <div class="compliance-card fade-in delay-3">
+        <div class="compliance-icon">🎓</div>
+        <div>
+          <div class="compliance-name">FERPA</div>
+          <div class="compliance-desc">Student education records processed and stored locally. Full compliance with Federal education privacy law.</div>
+        </div>
+      </div>
+      <div class="compliance-card fade-in delay-1">
+        <div class="compliance-icon">📊</div>
+        <div>
+          <div class="compliance-name">SEC Rule 17a-4</div>
+          <div class="compliance-desc">Tamper-evident local recordkeeping for financial advisors and broker-dealers.</div>
+        </div>
+      </div>
+      <div class="compliance-card fade-in delay-2">
+        <div class="compliance-icon">🔒</div>
+        <div>
+          <div class="compliance-name">BIPA (Illinois)</div>
+          <div class="compliance-desc">No biometric data collection or transmission. Zero exposure to Illinois Biometric Information Privacy Act liability.</div>
+        </div>
+      </div>
+      <div class="compliance-card fade-in delay-3">
+        <div class="compliance-icon">🇪🇺</div>
+        <div>
+          <div class="compliance-name">GDPR / CCPA</div>
+          <div class="compliance-desc">No data processing agreements needed. Data sovereignty is absolute — it lives on your machine.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compliance-footer fade-in delay-2">
+      <div class="big-badge">
+        <span>🛡️</span>
+        10 frameworks &nbsp;·&nbsp; 53 jurisdictions &nbsp;·&nbsp; Zero cloud exposure
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES GRID
+============================================================ -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything you need.<br/>Nothing you don't.</h2>
+      <p class="section-sub">A complete meeting intelligence platform — without the cloud dependency.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card fade-in delay-1">
+        <div class="feature-icon">🎙️</div>
+        <div class="feature-title">Live Audio Recording</div>
+        <div class="feature-desc">Record meetings in real-time with a single click. Audio is captured and processed locally — never streamed anywhere.</div>
+      </div>
+      <div class="feature-card fade-in delay-2">
+        <div class="feature-icon">🌍</div>
+        <div class="feature-title">37 Languages</div>
+        <div class="feature-desc">Whisper's multilingual model handles 37 languages. Your team works in their language, notes come out structured.</div>
+      </div>
+      <div class="feature-card fade-in delay-3">
+        <div class="feature-icon">📋</div>
+        <div class="feature-title">Industry Templates</div>
+        <div class="feature-desc">SOAP notes, legal briefs, IEPs, construction RFIs, financial disclosures, HR investigation reports, and 30+ more.</div>
+      </div>
+      <div class="feature-card fade-in delay-1">
+        <div class="feature-icon">📤</div>
+        <div class="feature-title">PDF / Markdown Export</div>
+        <div class="feature-desc">Export structured notes as professional PDFs or clean Markdown. Ready for your EHR, case management, or file system.</div>
+      </div>
+      <div class="feature-card fade-in delay-2">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Meeting Analytics</div>
+        <div class="feature-desc">Track speaking time, meeting frequency, topic trends, and action item completion — all computed locally.</div>
+      </div>
+      <div class="feature-card fade-in delay-3">
+        <div class="feature-icon">🔍</div>
+        <div class="feature-title">Full-Text Search</div>
+        <div class="feature-desc">Instantly search across all your transcripts and notes. Find any conversation, decision, or action item in milliseconds.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRICING
+============================================================ -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Transparent, honest pricing.</h2>
+      <p class="section-sub">Start free. Scale when you need to. No hidden fees, no per-seat gotchas, no data-for-discount trade-offs.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- FREE -->
+      <div class="pricing-card fade-in delay-1">
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">
+          <span class="price-amount">$0</span>
+        </div>
+        <div class="pricing-desc">Forever free. Your first 5 meetings every month, no strings attached.</div>
+        <ul class="pricing-features">
+          <li>5 meetings per month</li>
+          <li>Basic transcription</li>
+          <li>3 industry templates</li>
+          <li>PDF export</li>
+          <li>1 language</li>
+        </ul>
+      </div>
+
+      <!-- PRO -->
+      <div class="pricing-card popular fade-in delay-2">
+        <div class="popular-badge">Most Popular</div>
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price">
+          <span class="price-amount">$29</span>
+          <span class="price-period">/mo</span>
+        </div>
+        <div class="pricing-desc">Unlimited meetings with the full AI suite. Perfect for solo professionals.</div>
+        <ul class="pricing-features">
+          <li>Unlimited meetings</li>
+          <li>AI summaries &amp; action items</li>
+          <li>All 37+ templates</li>
+          <li>5 languages</li>
+          <li>PDF &amp; Markdown export</li>
+          <li>Full-text search</li>
+          <li>Meeting analytics</li>
+        </ul>
+      </div>
+
+      <!-- BUSINESS -->
+      <div class="pricing-card fade-in delay-3">
+        <div class="pricing-tier">Business</div>
+        <div class="pricing-price">
+          <span class="price-amount">$79</span>
+          <span class="price-period">/mo/user</span>
+        </div>
+        <div class="pricing-desc">Everything in Pro, plus team collaboration and custom templates.</div>
+        <ul class="pricing-features">
+          <li>Everything in Pro</li>
+          <li>Team workspace</li>
+          <li>Custom template builder</li>
+          <li>API access</li>
+          <li>All 37 languages</li>
+          <li>Priority support</li>
+        </ul>
+      </div>
+
+      <!-- ENTERPRISE -->
+      <div class="pricing-card fade-in delay-4">
+        <div class="pricing-tier">Enterprise</div>
+        <div class="pricing-price">
+          <span class="price-amount">$199</span>
+          <span class="price-period">/mo/user</span>
+        </div>
+        <div class="pricing-desc">Full compliance suite for regulated industries. SSO, audit logs, and dedicated support.</div>
+        <ul class="pricing-features">
+          <li>Everything in Business</li>
+          <li>HIPAA / FERPA templates</li>
+          <li>SSO (SAML / OIDC)</li>
+          <li>Audit logs</li>
+          <li>Compliance reporting</li>
+          <li>Dedicated success manager</li>
+          <li>SLA guarantee</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRIVACY ARCHITECTURE
+============================================================ -->
+<section class="section privacy-section" id="privacy">
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">Privacy Architecture</div>
+      <h2 class="section-title">By design, not policy.</h2>
+      <p class="section-sub">No privacy policy can protect you from a data breach. No BAA can un-ring that bell. Only an architecture that never transmits your data can guarantee privacy.</p>
+    </div>
+
+    <div class="arch-diagram fade-in delay-2">
+      <div class="arch-flow">
+        <div class="arch-node">
+          <div class="arch-node-icon">🎙️</div>
+          <div class="arch-node-name">Microphone</div>
+          <div class="arch-node-sub">Raw audio</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">🔊</div>
+          <div class="arch-node-name">Whisper</div>
+          <div class="arch-node-sub">On-device STT</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">🧠</div>
+          <div class="arch-node-name">Ollama</div>
+          <div class="arch-node-sub">On-device LLM</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">💾</div>
+          <div class="arch-node-name">Local Storage</div>
+          <div class="arch-node-sub">Your filesystem</div>
+        </div>
+      </div>
+
+      <div class="zero-cloud-hero">
+        <span>🚫</span>
+        ZERO CLOUD CONTACT
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA SECTION
+============================================================ -->
+<section class="section cta-section" id="cta">
+  <div class="glow-orb cta-glow"></div>
+  <div class="container">
+    <div class="cta-box fade-in">
+      <div class="section-label" style="margin: 0 auto 20px;">Open Source</div>
+      <h2 class="cta-title">Ready to own<br/>your meeting data?</h2>
+      <p class="cta-sub">Free to use. Free to inspect. Free to self-host. Your data belongs to you — always.</p>
+      <div class="cta-buttons">
+        <a href="https://github.com/Naitya07/ai-meeting-notes" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          Get Started — It's Free
+        </a>
+        <a href="https://github.com/Naitya07/ai-meeting-notes" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Star on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">
+          <div class="footer-logo-icon">🧠</div>
+          MeetingMind
+        </div>
+        <div class="footer-sub">Edge-Native AI Meeting Intelligence</div>
+      </div>
+
+      <div class="footer-links">
+        <a href="https://github.com/Naitya07/ai-meeting-notes" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/Naitya07/ai-meeting-notes/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/Naitya07/ai-meeting-notes/blob/main/README.md" target="_blank" rel="noopener">Docs</a>
+        <a href="#privacy">Privacy</a>
+      </div>
+
+      <div class="footer-copy">
+        &copy; 2025 MeetingMind. Open source under MIT License. Your data stays on your device — always.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+  // ── Scroll-triggered nav styling ──────────────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  // ── Mobile hamburger menu ──────────────────────────────────────
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  });
+
+  // Close mobile menu on link click
+  document.querySelectorAll('.mobile-nav-link, .mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // ── IntersectionObserver fade-in animations ───────────────────
+  const fadeEls = document.querySelectorAll('.fade-in');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  fadeEls.forEach(el => observer.observe(el));
+
+  // ── Smooth scroll for anchor links ───────────────────────────
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', (e) => {
+      const targetId = anchor.getAttribute('href').slice(1);
+      if (!targetId) return;
+      const target = document.getElementById(targetId);
+      if (target) {
+        e.preventDefault();
+        const navHeight = 64;
+        const targetTop = target.getBoundingClientRect().top + window.scrollY - navHeight - 16;
+        window.scrollTo({ top: targetTop, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // ── Active nav link highlighting ─────────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href').slice(1);
+          link.style.color = href === id ? 'var(--text)' : '';
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(section => sectionObserver.observe(section));
+</script>
+
+</body>
+</html>
